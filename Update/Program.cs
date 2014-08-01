@@ -34,7 +34,7 @@ namespace Update
 
             using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
             {
-                compare.GetStrucutreForHeader(3937, true);
+                compare.GetStrucutreForHeader(951, true);
             }
 
             Console.ReadLine();

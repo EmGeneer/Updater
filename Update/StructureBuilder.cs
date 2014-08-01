@@ -66,7 +66,7 @@ namespace Update
                 classLinesText.AppendLine(Line);
             }
 
-            Regex regex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat|while)\b");
+            Regex regex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat|while|new .*\(_arg1)\b");
             var match = regex.Matches(classLinesText.ToString());
             #endregion
 
@@ -98,7 +98,6 @@ namespace Update
                         }
                     }
                     #endregion
-
                     #region Check the while loop for readables
                     foreach (string Line in LinesOfWhileLoop)
                     {
@@ -161,6 +160,10 @@ namespace Update
                     }
                     #endregion
                 }
+                else if (Match.ToString().Contains("new "))
+                {
+                    mStructure.Append("[obj]omg[/obj]");
+                }
                 else
                 {
                     mStructure.Append(ConvertStringToChar(Match.ToString()) + ",");
@@ -168,6 +171,16 @@ namespace Update
             }
 
             Console.WriteLine("{0}: {1}", Header, mStructure.ToString());
+        }
+
+        internal void GetStructureForConstructor(List<string> Lines)
+        {
+
+        }
+
+        internal void GetStructureForWhileLoop(List<string> Lines)
+        {
+
         }
 
         internal bool ConstructorContainsReadables(string Line)
