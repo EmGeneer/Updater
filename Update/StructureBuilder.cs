@@ -14,7 +14,7 @@ namespace Update
         private readonly HabboClass MainClass;
         private readonly HabboClass ParserClass;
 
-        private StringBuilder mStructure;
+        private readonly StringBuilder mStructure;
 
         internal StructureBuilder(int Header, HabboClassManager Manager, HabboClass Class, HabboClass ParserClass)
         {
@@ -31,10 +31,11 @@ namespace Update
         /// 1. Read all lines contains readInteger|readString etc..
         /// 2. Find while() loops and analize them for more readables
         /// 3. Find new created objects and analize them for more readables
-        /// </summary>
-        
+        /// </summary>   
         internal void CreateStructure()
         {
+            mStructure.Append(Header + ": ");
+
             #region Add the lines from parse function to a list and read the readables with regex
             List<string> LinesOfParseMethod = new List<string>();
             bool isReading = false;
@@ -100,18 +101,19 @@ namespace Update
             }
         }
 
-        internal void ReadOutWhileLoop(List<string> LinesOfMethod)
+        internal List<string> ReadOutWhileLoop(List<string> LinesOfMethod)
         {
             #region Reading lines of while loop
             List<string> LinesOfWhileLoop = new List<string>();
             bool isReading = false;
+            LinesOfWhileLoop.Clear();
 
             foreach (string Line in LinesOfMethod)
             {
                 if (Line.Contains("while"))
                 {
                     isReading = true;
-                    // don't add this line
+                    LinesOfWhileLoop.Add(Line);
                 }
 
                 if (isReading)
@@ -119,9 +121,10 @@ namespace Update
                     LinesOfWhileLoop.Add(Line);
                 }
 
-                if (Line.Contains("}") && isReading)
+                if (Line.Contains("};") && isReading)
                 {
                     LinesOfWhileLoop.Add(Line);
+                    isReading = false;
                 }
             }
             #endregion
@@ -138,10 +141,15 @@ namespace Update
 
             foreach (var xMatch in match)
             {
+                // Fixed endless loop
                 if (!xMatch.ToString().Contains("while"))
+                {
                     ProgressRegexMatch(LinesOfWhileLoop, xMatch);
+                }
             }
             #endregion
+
+            return LinesOfWhileLoop;
         }
 
         internal void ReadOutObject(List<string> LinesOfMethod, string Match)
@@ -175,7 +183,6 @@ namespace Update
                     }
                 }
                 #endregion
-
                 #region Progress matches
                 StringBuilder classLinesText = new StringBuilder();
                 foreach (string Line in LinesOfObject)
