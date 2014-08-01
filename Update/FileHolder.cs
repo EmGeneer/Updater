@@ -66,7 +66,7 @@ namespace Update
                         ImportLines.Add(Line);
                     }
 
-                    if (Line.Contains("public class "))
+                    if (Line.Contains(" class "))
                     {
                         int IndexOfClassName = Line.IndexOf("class ");
                         ClassName = Line.Substring(IndexOfClassName).Split(' ')[1].Split(' ')[0];
@@ -95,6 +95,7 @@ namespace Update
 
             this.HabboClassManager.GetMessageComposer();
             this.HabboClassManager.GetMessageEvents();
+            this.HabboClassManager.ReadReadableNamespaces();
         }
     }
 }
