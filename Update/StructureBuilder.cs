@@ -15,6 +15,7 @@ namespace Update
         private readonly HabboClass ParserClass;
 
         private readonly StringBuilder mStructure;
+        private readonly Dictionary<int, string> mStructureDict;
 
         internal StructureBuilder(int Header, HabboClassManager Manager, HabboClass Class, HabboClass ParserClass)
         {
@@ -24,6 +25,7 @@ namespace Update
             this.ParserClass = ParserClass;
 
             this.mStructure = new StringBuilder();
+            this.mStructureDict = new Dictionary<int, string>();
         }
 
         /// <summary>
@@ -34,7 +36,7 @@ namespace Update
         /// </summary>   
         internal void CreateStructure()
         {
-            mStructure.Append(Header + ": ");
+            StructureAddItem(Header + ": ");
 
             #region Add the lines from parse function to a list and read the readables with regex
             List<string> LinesOfParseMethod = new List<string>();
@@ -74,8 +76,6 @@ namespace Update
             {
                 ProgressRegexMatch(LinesOfParseMethod, Match);
             }
-
-            Console.WriteLine(mStructure.ToString());
         }
 
         internal void ProgressRegexMatch(List<string> LinesOfMethod, object Match)
@@ -83,21 +83,21 @@ namespace Update
             if (Match.ToString().Contains("while"))
             {
                 // analyze everything, no check
-                mStructure.Append("{loop}");
+                StructureAddItem("{loop}");
                 ReadOutWhileLoop(LinesOfMethod);
-                mStructure.Append("{/loop}");
+                StructureAddItem("{/loop}");
             }
             else if (Match.ToString().Contains("new"))
             {
                 // check if this instance is already analyzed in a while loop
-                mStructure.Append("{object}");
+                StructureAddItem("{object}");
                 ReadOutObject(LinesOfMethod, Match.ToString());
-                mStructure.Append("{/object}");
+                StructureAddItem("{/object}");
             }
             else
             {
                 // add to structure builder, no check needed
-                mStructure.Append(ConvertStringToChar(Match.ToString()) + ",");
+                StructureAddItem(ConvertStringToChar(Match.ToString()) + ",");
             }
         }
 
@@ -200,6 +200,13 @@ namespace Update
                 #endregion
             }
         }
+
+        private int ItemCounter = 0;
+        internal void StructureAddItem(string Item)
+        {
+            mStructure.Append(Item);
+            mStructureDict.Add(ItemCounter++, Item);
+        }
         
         internal bool ConstructorContainsReadables(string Line)
         {
@@ -232,9 +239,52 @@ namespace Update
             }
         }
 
+        public string RealStructure()
+        {
+            string mStructureString = mStructure.ToString();
+
+            Regex regex = new Regex(@"(\{\bloop\b\}.*?\{\/\bloop\})");
+            var Matches = regex.Matches(mStructureString);
+
+            StringBuilder newStruct = new StringBuilder();
+
+            foreach (var Match in Matches)
+            {
+                int indexOfLoopStart = Match.ToString().IndexOf("{loop}");
+                int indexOfLoopEnd = Match.ToString().IndexOf("{/loop}");
+
+                string innerLoopItems = Match.ToString().Replace("{loop}", "").Replace("{/loop}", "").Replace("{object}", "{object},").Replace("{/object}", "{/object},");
+
+                string[] items = innerLoopItems.Split(',');
+                int CountToRemove = 0;
+
+                foreach (string Item in items)
+                {
+                    if (Item != string.Empty)
+                    {
+                        CountToRemove++;
+                    }
+                }
+
+                int Key = mStructureDict.FirstOrDefault(x => x.Value == "{/loop}").Key;
+
+                for (int i = 1; i <= CountToRemove; i++)
+                {
+                    mStructureDict.Remove(Key + i);
+                }
+            }
+
+            foreach (var Item in mStructureDict.Values)
+            {
+                newStruct.Append(Item);
+            }
+
+            return newStruct.ToString();
+        }
+
         public override string ToString()
         {
-            return mStructure.ToString();
+            return RealStructure();
         }
     }
 }

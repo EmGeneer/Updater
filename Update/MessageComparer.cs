@@ -40,7 +40,7 @@ namespace Update
 
                         StructureBuilder builder = new StructureBuilder(Header, _FileOne.HabboClassManager, Class, ParserClass);
                         builder.CreateStructure();
-                        //Console.WriteLine(builder.ToString());
+                        Console.WriteLine(builder.ToString());
                     }
                     else
                     {

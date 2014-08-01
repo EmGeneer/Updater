@@ -40,7 +40,7 @@ namespace Update
 
             using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
             {
-                compare.GetStrucutreForHeader(3885, true);
+                compare.GetStrucutreForHeader(951, true);
             }
 
             CLI cli = new CLI();
