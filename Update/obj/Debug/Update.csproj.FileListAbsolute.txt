@@ -1,0 +1,6 @@
+c:\users\henrik\documents\visual studio 2013\Projects\Update\Update\bin\Debug\Update.exe.config
+C:\Users\Henrik\Documents\Visual Studio 2013\Projects\Update\Update\obj\Debug\Update.csprojResolveAssemblyReference.cache
+C:\Users\Henrik\Documents\Visual Studio 2013\Projects\Update\Update\bin\Debug\Update.exe
+C:\Users\Henrik\Documents\Visual Studio 2013\Projects\Update\Update\bin\Debug\Update.pdb
+C:\Users\Henrik\Documents\Visual Studio 2013\Projects\Update\Update\obj\Debug\Update.exe
+C:\Users\Henrik\Documents\Visual Studio 2013\Projects\Update\Update\obj\Debug\Update.pdb
