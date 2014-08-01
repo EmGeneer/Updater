@@ -142,7 +142,7 @@ namespace Update
                                         constructorLines.AppendLine(nLine);
                                     }
 
-                                    Regex nregex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat)\b");
+                                    Regex nregex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat|while|new .*\(_arg1)\b");
                                     var nmatch = regex.Matches(constructorLines.ToString());
 
                                     if (nmatch.Count > 0)
@@ -162,7 +162,67 @@ namespace Update
                 }
                 else if (Match.ToString().Contains("new "))
                 {
-                    mStructure.Append("[obj]omg[/obj]");
+                    mStructure.Append("{object}");
+                    #region get readables from object
+                    string NewClassName = Match.ToString().Split(' ')[1].Split('(')[0];
+                    HabboClass Class = null;
+                    if (this.ClassManager.CachedHabboClasses.TryGetValue(NewClassName, out Class))
+                    {
+                        if (Class != null)
+                        {
+                            List<string> LinesOfConstructor = new List<string>();
+
+                            bool isReadingConstructor = false;
+
+                            foreach (string nLine in Class.ClassLines)
+                            {
+                                if (nLine.Contains("public function " + Class.ClassId) && !isReadingConstructor)
+                                {
+                                    LinesOfConstructor.Add(nLine);
+                                    isReadingConstructor = true;
+                                }
+
+                                if (isReadingConstructor)
+                                {
+                                    LinesOfConstructor.Add(nLine);
+                                }
+
+                                if (nLine == "}" && isReadingConstructor)
+                                {
+                                    LinesOfParseMethod.Add(nLine);
+                                    isReadingConstructor = false;
+                                }
+                            }
+
+                            StringBuilder constructorLines = new StringBuilder();
+                            foreach (string nLine in LinesOfConstructor)
+                            {
+                                constructorLines.AppendLine(nLine);
+                            }
+
+                            Regex nregex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat|while|new .*\(_arg1)\b");
+                            var nmatch = regex.Matches(constructorLines.ToString());
+
+                            if (nmatch.Count > 0)
+                            {
+                                foreach (var smatch in nmatch)
+                                {
+                                    if (smatch.ToString().Contains("new"))
+                                    {
+                                        // get the function class again... have to rewrite the whole class :)
+                                        // todo: write a clean plan how to parse whiles in whiles and objects in objects..
+                                    }
+                                    else
+                                    {
+                                        mStructure.Append(ConvertStringToChar(smatch.ToString()) + ",");
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    #endregion
+                    mStructure.Append("{/object}");
                 }
                 else
                 {
