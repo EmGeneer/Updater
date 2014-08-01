@@ -25,6 +25,39 @@ namespace Update
                 UpdateMessageEvent(OldHeader);
         }
 
+        internal void GetStrucutreForHeader(int Header, bool searchInOldFile)
+        {
+            HabboClass Class = null;
+            HabboClass ParserClass = null;
+
+            if (searchInOldFile)
+            {
+                if (_FileOne.HabboClassManager.CachedMessageEvents.TryGetValue(Header, out Class))
+                {
+                    if (Class.ParserClass != string.Empty)
+                    {
+                        ParserClass = _FileOne.HabboClassManager.GetClassByName(Class.ParserClass);
+
+                        StructureBuilder builder = new StructureBuilder(Header, _FileOne.HabboClassManager, Class, ParserClass);
+                        builder.BuildStructure();
+                        //Console.WriteLine(builder.ToString());
+                    }
+                    else
+                    {
+                        Console.WriteLine("There is no parser class for class {0}", Class.ClassId);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Can't find header {0} in file {1}", Header, _FileOne.File);
+                }
+            }
+            else
+            {
+
+            }
+        }
+
         internal void UpdateMessageComposer(int OldHeader)
         {
             HabboClass Class = null;

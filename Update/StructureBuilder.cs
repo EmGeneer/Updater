@@ -196,7 +196,7 @@ namespace Update
             else if (Input == "readFloat")
                 return "F";
             else
-                return "";
+                return "UNDEFINED";
         }
 
         public override string ToString()

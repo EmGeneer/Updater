@@ -27,9 +27,14 @@ namespace Update
 
             Console.WriteLine();
 
+            //using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
+            //{
+            //    compare.UpdateHeader(3937, false);
+            //}
+
             using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
             {
-                compare.UpdateHeader(3937, false);
+                compare.GetStrucutreForHeader(3937, true);
             }
 
             Console.ReadLine();
