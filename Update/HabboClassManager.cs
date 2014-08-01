@@ -15,6 +15,7 @@ namespace Update
         internal Dictionary<string, HabboClass> CachedHabboClasses;
         internal Dictionary<string, string> ReadableNamespaces;
 
+        internal string RegexString;
         internal string Release;
 
         internal HabboClassManager(FileHolder FileHolder)
@@ -123,11 +124,13 @@ namespace Update
                             }
                         }
 
-                        Console.WriteLine("Replaced names: ");
-                        foreach (var reader in this.ReadableNamespaces)
-                        {
-                            Console.WriteLine(reader.Key + " - " + reader.Value);
-                        }
+                        RegexString = string.Format(@"\b({0}|{1}|{2}|{3}|{4}|{5}|while|new .*\(_arg1)\b", 
+                            this.ReadableNamespaces["readInteger"], 
+                            this.ReadableNamespaces["readString"], 
+                            this.ReadableNamespaces["readBoolean"], 
+                            this.ReadableNamespaces["readByte"], 
+                            this.ReadableNamespaces["readShort"], 
+                            this.ReadableNamespaces["readFloat"]);
                     }
                     else
                     {

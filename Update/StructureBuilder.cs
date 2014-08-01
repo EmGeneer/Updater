@@ -33,6 +33,60 @@ namespace Update
         /// 3. Find new created objects and analize them for more readables
         /// </summary>
         
+        internal void CreateStructure()
+        {
+            #region Add the lines from parse function to a list and read the readables with regex
+            List<string> LinesOfParseMethod = new List<string>();
+            bool isReading = false;
+
+            foreach (string Line in ParserClass.ClassLines)
+            {
+                if (Line.Contains("public function parse") && !isReading)
+                {
+                    LinesOfParseMethod.Add(Line);
+                    isReading = true;
+                }
+
+                if (isReading)
+                {
+                    LinesOfParseMethod.Add(Line);
+                }
+
+                if (Line == "}" && isReading)
+                {
+                    LinesOfParseMethod.Add(Line);
+                    isReading = false;
+                }
+            }
+
+            StringBuilder classLinesText = new StringBuilder();
+            foreach (string Line in LinesOfParseMethod)
+            {
+                classLinesText.AppendLine(Line);
+            }
+
+            Regex regex = new Regex(@ClassManager.RegexString);
+            var match = regex.Matches(classLinesText.ToString());
+            #endregion
+
+            foreach (var Match in match)
+            {
+                if (Match.ToString().Contains("while"))
+                {
+                }
+            }
+        }
+
+        internal void ReadOutWhileLoop()
+        {
+
+        }
+
+        internal void ReadOutObject()
+        {
+
+        }
+        
         // I know the LinesOfParse and LineOfWhileLoop are hard coded :)
         internal void BuildStructure()
         {
