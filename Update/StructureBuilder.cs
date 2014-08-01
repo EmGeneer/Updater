@@ -36,8 +36,8 @@ namespace Update
         // I know the LinesOfParse and LineOfWhileLoop are hard coded :)
         internal void BuildStructure()
         {
+            #region Add the lines from parse function to a list and read the readables with regex
             List<string> LinesOfParseMethod = new List<string>();
-
             bool isReading = false;
 
             foreach (string Line in ParserClass.ClassLines)
@@ -68,14 +68,98 @@ namespace Update
 
             Regex regex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat|while)\b");
             var match = regex.Matches(classLinesText.ToString());
-
-            Console.WriteLine("Found {0} matches.", match.Count);
+            #endregion
 
             foreach (var Match in match)
             {
                 if (Match.ToString().Contains("while"))
                 {
+                    #region Add Lines from while loop to a list
                     List<string> LinesOfWhileLoop = new List<string>();
+                    bool isReadingWhileLoop = false;
+
+                    foreach (string Line in LinesOfParseMethod)
+                    {
+                        if (Line.Contains("while ("))
+                        {
+                            LinesOfWhileLoop.Add(Line);
+                            isReadingWhileLoop = true;
+                        }
+
+                        if (isReadingWhileLoop)
+                        {
+                            LinesOfWhileLoop.Add(Line);
+                        }
+
+                        if (Line == "};")
+                        {
+                            LinesOfWhileLoop.Add(Line);
+                            isReadingWhileLoop = false;
+                        }
+                    }
+                    #endregion
+
+                    #region Check the while loop for readables
+                    foreach (string Line in LinesOfWhileLoop)
+                    {
+                        // check if constructor contains readables
+                        if (Line.Contains("= new ") || Line.Contains("(new "))
+                        {
+                            if (!ConstructorContainsReadables(Line))
+                            {
+                                int IndexOfNew = Line.IndexOf("new ");
+                                string ClassNameToRead = Line.Substring(IndexOfNew).Split('(')[0].Replace("new ", "");
+                                HabboClass NewClassToRead = this.ClassManager.GetClassByName(ClassNameToRead);
+
+                                if (NewClassToRead != null)
+                                {
+                                    List<string> LinesOfConstructor = new List<string>();
+
+                                    bool isReadingConstructor = false;
+
+                                    foreach (string nLine in NewClassToRead.ClassLines)
+                                    {
+                                        if (nLine.Contains("public function " + NewClassToRead.ClassId) && !isReadingConstructor)
+                                        {
+                                            LinesOfConstructor.Add(nLine);
+                                            isReadingConstructor = true;
+                                        }
+
+                                        if (isReadingConstructor)
+                                        {
+                                            LinesOfConstructor.Add(nLine);
+                                        }
+
+                                        if (nLine == "}" && isReadingConstructor)
+                                        {
+                                            LinesOfParseMethod.Add(nLine);
+                                            isReadingConstructor = false;
+                                        }
+                                    }
+
+                                    StringBuilder constructorLines = new StringBuilder();
+                                    foreach (string nLine in LinesOfConstructor)
+                                    {
+                                        constructorLines.AppendLine(nLine);
+                                    }
+
+                                    Regex nregex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat)\b");
+                                    var nmatch = regex.Matches(constructorLines.ToString());
+
+                                    if (nmatch.Count > 0)
+                                    {
+                                        mStructure.Append("{loop}");
+                                        foreach (var smatch in nmatch)
+                                        {
+                                            mStructure.Append(ConvertStringToChar(smatch.ToString()) + ",");
+                                        }
+                                        mStructure.Append("{/loop}");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    #endregion
                 }
                 else
                 {
@@ -84,6 +168,17 @@ namespace Update
             }
 
             Console.WriteLine("{0}: {1}", Header, mStructure.ToString());
+        }
+
+        internal bool ConstructorContainsReadables(string Line)
+        {
+            Regex regex = new Regex(@"\b(readInteger|readString|readBoolean|readShort|readByte|readFloat)\b");
+            var match = regex.Matches(Line);
+
+            if (match.Count == 0)
+                return false;
+            else
+                return true;
         }
 
         internal string ConvertStringToChar(string Input)
@@ -106,7 +201,7 @@ namespace Update
 
         public override string ToString()
         {
-            return base.ToString();
+            return mStructure.ToString();
         }
     }
 }
