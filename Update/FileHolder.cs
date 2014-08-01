@@ -27,6 +27,7 @@ namespace Update
             this.FileLines = new List<string>();
         }
 
+        #region Reading the text file
         internal void ReadTextFile()
         {
             using (StreamReader reader = new StreamReader(this.File))
@@ -42,7 +43,9 @@ namespace Update
                 }
             }
         }
+        #endregion
 
+        #region Reading some habbo stuff such as all classes
         internal void ReadHabboStuff()
         {
             this.HabboClassManager = new HabboClassManager(this);
@@ -91,11 +94,12 @@ namespace Update
                 this.HabboClassManager.AddHabboClass(hhClass);
             }
 
-            Console.WriteLine("Found Release: " + HabboClassManager.GetRelease());
+            Console.WriteLine("[{0}] Found Release: {1}", File, HabboClassManager.GetRelease());
 
             this.HabboClassManager.GetMessageComposer();
             this.HabboClassManager.GetMessageEvents();
             this.HabboClassManager.ReadReadableNamespaces();
         }
+        #endregion
     }
 }

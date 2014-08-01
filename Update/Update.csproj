@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLI.cs" />
     <Compile Include="FileHolder.cs" />
     <Compile Include="HabboClass.cs" />
     <Compile Include="HabboClassManager.cs" />
