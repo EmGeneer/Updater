@@ -16,6 +16,7 @@ namespace Update
 
         private readonly StringBuilder mStructure;
         private readonly Dictionary<int, string> mStructureDict;
+        private int ItemCounter = 0;
 
         internal StructureBuilder(int Header, HabboClassManager Manager, HabboClass Class, HabboClass ParserClass)
         {
@@ -80,6 +81,7 @@ namespace Update
 
         internal void ProgressRegexMatch(List<string> LinesOfMethod, object Match)
         {
+            #region Progress regex matches to find more readables and add them to the structure
             if (Match.ToString().Contains("while"))
             {
                 // analyze everything, no check
@@ -99,6 +101,7 @@ namespace Update
                 // add to structure builder, no check needed
                 StructureAddItem(ConvertStringToChar(Match.ToString()) + ",");
             }
+            #endregion
         }
 
         internal List<string> ReadOutWhileLoop(List<string> LinesOfMethod)
@@ -154,6 +157,7 @@ namespace Update
 
         internal void ReadOutObject(List<string> LinesOfMethod, string Match)
         {
+            #region Reading the new class name and progressing the constructor
             string ClassName = Match.Substring(Match.IndexOf("new ")).Split('(')[0].Replace("new ", "");
             HabboClass Class = null;
 
@@ -199,28 +203,20 @@ namespace Update
                 }
                 #endregion
             }
+            #endregion
         }
 
-        private int ItemCounter = 0;
         internal void StructureAddItem(string Item)
         {
+            #region Adds a new item to the structure
             mStructure.Append(Item);
             mStructureDict.Add(ItemCounter++, Item);
-        }
-        
-        internal bool ConstructorContainsReadables(string Line)
-        {
-            Regex regex = new Regex(@ClassManager.RegexString);
-            var match = regex.Matches(Line);
-
-            if (match.Count == 0)
-                return false;
-            else
-                return true;
+            #endregion
         }
 
         internal string ConvertStringToChar(string Input)
         {
+            #region Converts a string like "readInteger" into "I"
             if (Input == "readInteger")
                 return "I";
             else if (Input == "readString")
@@ -237,10 +233,12 @@ namespace Update
             {
                 return "UNDEFINED";
             }
+            #endregion
         }
 
         public string RealStructure()
         {
+            #region Converts the structure in real structure, means that this is the part where duplicates are removed :)
             string mStructureString = mStructure.ToString();
 
             Regex regex = new Regex(@"(\{\bloop\b\}.*?\{\/\bloop\})");
@@ -250,9 +248,6 @@ namespace Update
 
             foreach (var Match in Matches)
             {
-                int indexOfLoopStart = Match.ToString().IndexOf("{loop}");
-                int indexOfLoopEnd = Match.ToString().IndexOf("{/loop}");
-
                 string innerLoopItems = Match.ToString().Replace("{loop}", "").Replace("{/loop}", "").Replace("{object}", "{object},").Replace("{/object}", "{/object},");
 
                 string[] items = innerLoopItems.Split(',');
@@ -280,6 +275,7 @@ namespace Update
             }
 
             return newStruct.ToString();
+            #endregion
         }
 
         public override string ToString()
