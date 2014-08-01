@@ -39,7 +39,7 @@ namespace Update
                         ParserClass = _FileOne.HabboClassManager.GetClassByName(Class.ParserClass);
 
                         StructureBuilder builder = new StructureBuilder(Header, _FileOne.HabboClassManager, Class, ParserClass);
-                        builder.BuildStructure();
+                        builder.CreateStructure();
                         //Console.WriteLine(builder.ToString());
                     }
                     else
@@ -84,7 +84,7 @@ namespace Update
                 if (ParserClass != null)
                 {
                     StructureBuilder builder = new StructureBuilder(OldHeader, _FileOne.HabboClassManager, Class, ParserClass);
-                    builder.BuildStructure();
+                    builder.CreateStructure();
                 }
                 else
                 {
