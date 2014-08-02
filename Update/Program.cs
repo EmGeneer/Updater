@@ -33,17 +33,17 @@ namespace Update
 
             Console.WriteLine();
 
-            //using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
-            //{
-            //    compare.UpdateHeader(3937, false);
-            //}
+            using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
+            {
+                compare.GetStrucutreForHeader(1519, true);
+            }
 
             using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
             {
-                compare.GetStrucutreForHeader(951, true);
+                compare.UpdateHeader(1519, false);
             }
 
-            CLI cli = new CLI();
+            //CLI cli = new CLI();
 
             lock (syncRoot)
             {

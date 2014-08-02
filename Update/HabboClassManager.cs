@@ -262,6 +262,21 @@ namespace Update
         }
         #endregion
 
+        #region Get a messageeventheader by a classname
+        internal int GetMessageEventHeaderByClassName(string classname)
+        {
+            foreach (var Class in CachedMessageEvents)
+            {
+                if (Class.Value != null)
+                {
+                    if (Class.Value.ClassId == classname)
+                        return Class.Key;
+                }
+            }
+            return 0;
+        }
+        #endregion
+
         #region Parse out Release
         internal string GetRelease()
         {

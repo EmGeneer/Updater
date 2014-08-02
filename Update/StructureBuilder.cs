@@ -231,7 +231,7 @@ namespace Update
                 return "F";
             else
             {
-                return "UNDEFINED";
+                return "{" + Input + "}";
             }
             #endregion
         }

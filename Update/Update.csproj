@@ -48,6 +48,8 @@
     <Compile Include="MessageComparer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SearchResult.cs" />
+    <Compile Include="SearchResultComparer.cs" />
     <Compile Include="StructureBuilder.cs" />
   </ItemGroup>
   <ItemGroup>

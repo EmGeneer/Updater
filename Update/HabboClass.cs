@@ -19,5 +19,10 @@ namespace Update
             this.ClassLines = ClassLines;
             this.ParserClass = ParserClass;
         }
+
+        internal void SetConstructorCallAndClass()
+        {
+
+        }
     }
 }
