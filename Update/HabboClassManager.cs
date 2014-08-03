@@ -12,6 +12,7 @@ namespace Update
         internal FileHolder FileHolder;
         internal Dictionary<int, HabboClass> CachedMessageComposer;
         internal Dictionary<int, HabboClass> CachedMessageEvents;
+        internal Dictionary<string, HabboClass> CachedIncomingMessagesClasses;
         internal Dictionary<string, HabboClass> CachedHabboClasses;
         internal Dictionary<string, string> ReadableNamespaces;
 
@@ -24,6 +25,7 @@ namespace Update
             CachedMessageEvents = new Dictionary<int, HabboClass>();
             CachedHabboClasses = new Dictionary<string, HabboClass>();
             ReadableNamespaces = new Dictionary<string, string>();
+            CachedIncomingMessagesClasses = new Dictionary<string, HabboClass>();
             this.FileHolder = FileHolder;
         }
 
@@ -44,6 +46,50 @@ namespace Update
 
             return Class;
         }
+
+        #region Get all incoming messages classes
+        internal void ReadIncomingMessageClasses()
+        {
+            string[] Classes = Regex.Split(FileHolder.WholeFile, "//------------------------------------------------------------");
+            
+            foreach (string Class in Classes)
+            {
+                string[] Lines = Regex.Split(Class, "\n");
+
+                List<string> ClassLines = new List<string>();
+
+                string ClassName = string.Empty;
+                string IncomingHandler = string.Empty;
+                string ParserClass = string.Empty;
+
+                foreach (string Line in Lines)
+                {
+                    if (Line.Contains(" class "))
+                    {
+                        int IndexOfClassName = Line.IndexOf("class ");
+                        ClassName = Line.Substring(IndexOfClassName).Split(' ')[1].Split(' ')[0];
+                    }
+
+                    if (Line.Contains("public function IncomingMessages(_arg1:"))
+                    {
+                        IncomingHandler = Line.Split(':')[1].Split(')')[0];
+                    }
+
+                    ClassLines.Add(Line);
+                }
+
+                if (IncomingHandler != string.Empty && ClassName == "IncomingMessages")
+                {
+                    var newClass = new HabboClass(ClassName, ClassLines, ParserClass);
+                    newClass.ReadAllHabboConnectionMessageEvents();
+
+                    this.CachedIncomingMessagesClasses.Add(IncomingHandler, newClass);
+                }
+            }
+
+            Console.WriteLine("[{0}] Found {1} IncomingMessages classes", FileHolder.File, CachedIncomingMessagesClasses.Count);
+        }
+        #endregion
 
         #region Reads all Namespaces for readables
         internal void ReadReadableNamespaces()

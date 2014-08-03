@@ -99,6 +99,7 @@ namespace Update
             this.HabboClassManager.GetMessageComposer();
             this.HabboClassManager.GetMessageEvents();
             this.HabboClassManager.ReadReadableNamespaces();
+            this.HabboClassManager.ReadIncomingMessageClasses();
         }
         #endregion
     }

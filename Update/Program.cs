@@ -33,17 +33,38 @@ namespace Update
 
             Console.WriteLine();
 
-            using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
-            {
-                compare.GetStrucutreForHeader(1519, true);
-            }
+            StringBuilder StringToSave = new StringBuilder();
 
             using (MessageComparer compare = new MessageComparer(FileOne, FileTwo))
             {
-                compare.UpdateHeader(1519, false);
-            }
+                StringToSave.AppendLine(string.Format("MessageEvents for {0}", FileTwo.HabboClassManager.Release));
+                StringToSave.AppendLine("{loop} => While loop");
+                StringToSave.AppendLine("{object} => New object in swf");
+                StringToSave.AppendLine("I => Integer");
+                StringToSave.AppendLine("S => String");
+                StringToSave.AppendLine("B => Boolean");
+                StringToSave.AppendLine("F => Float");
+                StringToSave.AppendLine("BYTE => Byte");
+                StringToSave.AppendLine("SH => Short");
+                StringToSave.AppendLine("----------------------------------------------------");
+                StringToSave.AppendLine("");
 
-            //CLI cli = new CLI();
+                foreach (int Header in FileTwo.HabboClassManager.CachedMessageEvents.Keys)
+                {
+                    if (Header > 0)
+                    {
+                        string structure = compare.GetStrucutreForHeader(Header, false);
+                        StringToSave.AppendLine(structure);
+                    }
+                }
+
+                using (StreamWriter writer = new StreamWriter("structures_" + FileTwo.HabboClassManager.Release + ".txt"))
+                {
+                    writer.WriteLine(StringToSave.ToString());
+                }
+
+                Console.WriteLine("Finished saving the message events..");
+            }
 
             lock (syncRoot)
             {

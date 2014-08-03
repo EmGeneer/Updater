@@ -26,10 +26,10 @@ namespace Update
                 UpdateMessageEvent(OldHeader);
         }
 
-        internal void GetStrucutreForHeader(int Header, bool searchInOldFile)
+        internal string GetStrucutreForHeader(int Header, bool searchInOldFile)
         {
-            HabboClass Class = null;
-            HabboClass ParserClass = null;
+            HabboClass Class;
+            HabboClass ParserClass;
 
             if (searchInOldFile)
             {
@@ -39,9 +39,12 @@ namespace Update
                     {
                         ParserClass = _FileOne.HabboClassManager.GetClassByName(Class.ParserClass);
 
-                        StructureBuilder builder = new StructureBuilder(Header, _FileOne.HabboClassManager, Class, ParserClass);
-                        builder.CreateStructure();
-                        Console.WriteLine(builder.ToString());
+                        if (ParserClass != null)
+                        {
+                            StructureBuilder builder = new StructureBuilder(Header, _FileOne.HabboClassManager, Class, ParserClass);
+                            builder.CreateStructure();
+                            return builder.ToString();
+                        }
                     }
                     else
                     {
@@ -55,8 +58,31 @@ namespace Update
             }
             else
             {
+                if (_FileTwo.HabboClassManager.CachedMessageEvents.TryGetValue(Header, out Class))
+                {
+                    if (Class.ParserClass != string.Empty)
+                    {
+                        ParserClass = _FileTwo.HabboClassManager.GetClassByName(Class.ParserClass);
 
+                        if (ParserClass != null)
+                        {
+                            StructureBuilder builder = new StructureBuilder(Header, _FileTwo.HabboClassManager, Class, ParserClass);
+                            builder.CreateStructure();
+                            return builder.ToString();
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("There is no parser class for class {0}", Class.ClassId);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Can't find header {0} in file {1}", Header, _FileOne.File);
+                }
             }
+
+            return string.Empty;
         }
 
         /*
